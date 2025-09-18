@@ -191,24 +191,29 @@ class HBNBCommand(cmd.Cmd):
             return False
         attribute_value = arg_list[3]
 
-        # Remove quotes from attribute_value if present
-        if attribute_value.startswith('"') and attribute_value.endswith('"'):
-            attribute_value = attribute_value[1:-1]
-        
-        # Try to convert to int or float if possible
         if attribute_value.isdigit():
-            attribute_value = int(attribute_value)
-        else:
-            try:
-                if '.' in attribute_value:
-                    attribute_value = float(attribute_value)
-            except ValueError:
-                pass  # Keep as string if conversion fails
+            if isinstance(attribute_value, float):
+                attribute_value = float(attribute_value)
+            elif isinstance(attribute_value, int):
+                attribute_value = int(attribute_value)
+
+        # update BaseModel 00c0c670-e5f3-4603-9aa1-3caca5ee0e75
+        # email "aibnb@mail.com"
 
         obj = all_objects[object_key]
-        # Set the attribute value
-        setattr(obj, attribute_name, attribute_value)
-        obj.save()
+        # check if the attribute exist already
+        if attribute_name in obj.to_dict():
+            attribute_original_type = type(obj[attribute_name])
+            attribute_value = attribute_original_type(attribute_value)
+
+            if attribute_original_type in {str, int, float}:
+                attribute_value = attribute_original_type(attribute_value)
+                obj[attribute_name] = attribute_value
+        # if it doesn’t exist we add it
+        else:
+            obj.__dict__.update({attribute_name: attribute_value})
+
+        storage.save()
 
 
 if __name__ == "__main__":

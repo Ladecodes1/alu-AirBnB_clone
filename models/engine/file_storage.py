@@ -36,43 +36,17 @@ class FileStorage:
             return
         try:
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
-                if not content:
-                    raise ValueError("Empty file")
-                obj_dict = json.loads(content)
+                obj_dict = json.load(f)
             for key, val in obj_dict.items():
                 cls_name = val.get("__class__")
                 if not cls_name:
                     continue
                 try:
-                    if cls_name == "BaseModel":
-                        from models.base_model import BaseModel
-                        cls = BaseModel
-                    elif cls_name == "User":
-                        from models.user import User
-                        cls = User
-                    elif cls_name == "State":
-                        from models.state import State
-                        cls = State
-                    elif cls_name == "City":
-                        from models.city import City
-                        cls = City
-                    elif cls_name == "Amenity":
-                        from models.amenity import Amenity
-                        cls = Amenity
-                    elif cls_name == "Place":
-                        from models.place import Place
-                        cls = Place
-                    elif cls_name == "Review":
-                        from models.review import Review
-                        cls = Review
-                    else:
-                        continue
+                    module = __import__("models." + cls_name.lower(), fromlist=[cls_name])
+                    cls = getattr(module, cls_name)
                     FileStorage.__objects[key] = cls(**val)
                 except Exception:
-                    # could not recreate the object (class file missing or error) 
+                    # could not recreate the object (class file missing or  skiperror) 
                     continue
-        except ValueError:
-            raise
         except Exception:
             pass
