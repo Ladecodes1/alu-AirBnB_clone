@@ -3,5 +3,8 @@
 from models.base_model import BaseModel
 
 class User(BaseModel):
-    """User for AirBnB (empty attributes for now)."""
-    pass
+    """User for AirBnB."""
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""

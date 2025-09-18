@@ -4,4 +4,6 @@ from models.base_model import BaseModel
 
 class Review(BaseModel):
     """Review for AirBnB."""
-    pass
+    place_id = ""
+    user_id = ""
+    text = ""
